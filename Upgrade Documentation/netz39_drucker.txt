@@ -1,0 +1,82 @@
+Modernisierung Mono Mendel
+
+======= Probleme =======
+
+
+- Druckbett Leveling (Drucker kann nicht ohne gerade druckplatte vernünftig funktionieren,  erstes layer entscheidet 
+sehr viel über aussehen des fertigen drucks)
+
+- Druckbett hafting   (Borosilikatglasplatte mit kapton funktioniert zwar etwas, reiß aber ständig ab und kapton ist teuer
+Glasplatte transferiert hitze nicht wirklich gut)
+
+- Extruder heizt einfach so ohne das er den auftrag bekommen hat (sicherheitsrisiko, fiament was noch in der düse ist degradiert, kann zu verstopfung führen)
+
+- high-power anschlüsse nicht gecrimpt und verzinnt  (verzinne kabel über die viel strom fließt sind schlechte idee,   zinn oxidiert schnell und sorgt für großen übergangswiderstand -> wärmeentwicklung, brandgefahr)
+
+- schleppkabel sind unsupported was zu schnellerer kabelermüdung und verheddern führt
+
+
+======== Lösungen ===========
+Einfachste zuerst
+
+- High-power anschlüsse haben crimpkontakte bekommen und wurden fest verschraubt 
+- Druckbett haftung.  Glasplatte wird nicht mehr benutzt. Darunter liegende aluminiumplatte hat eine PEI oberfläche bekommen (~200µm dick) (Grund für dicke in druckbett leveling geklärt). PEI hat vorteil, das es hervorragende haftung zu  PLA, ABS, PETG*, TPU*, PC, PA bietet aber nur bei wärme (55°C und auffwärts).  Bei abkühlung lösen sich druckteile fast von alleine.  
+Oberfläche ist wartungsarm -> vor jedem druck mit isoprop abwischen;  bei großen fettspuren (passiert durch berühren der oberfläche) mit aceton reinigen.  Preisgünstig.  Austausch der oberfläche verlinken 
+
+- Extruder heizt einfach hoch  Konnte durch upgrade auf eine moderne marlin version gelöst werden. Fertige konfiguration kann auf speicherkarte im melzi board gefunden werden.
+
+- Druckbett leveling.  Die Extruder carriage umdesigned um platz für einen induktiven näherungssensor platz zu schaffen (->teil verlinken), dieser ersetzt den Z-Endstopp. Da sensor nur 1mm vor druckbett triggert wurde das pei so dünn gewählt (Sensor kann eigentlich 4mm jedoch nur gegen eisen / stahl. Druckplatt ist aluminium -> 1mm). 
+
+- schleppkabel,  zur unterstützung und vermeidung großer knickwinkel wurden abs filamentstücken in den kabelstrang einbezogen und mit kabelbindern fixiert 
+
+
+========= Probleme bei Implementierung =============
+Oh boy here we go....
+Wie vorher die einfachsten zuerst. 
+
+- High-power anschlüsse.  Kabel sind ganz schön fett für schraubterminals,   power in kabel ist sehr kurz bemessen
+
+- pei oberfläche:  bei beschädigung ist austausch aufwendig und potentiell gefährtlich. Benötigte chemikalie (Orangenterpentin/Lemonen-D ist vorhanden bei @micha_alb)
+
+- Extruder heizen / bed leveling: benötigte firwareupgrade.   Drucker hat ein melzi v2 board (genauer noch mal nachgucken). 
+Moderne 8-Bit drucker emulieren ein arduino board (meistens uno mit atmega2560). Unser board emuliert einen sanguino. Dieser ist nicht mehr in der aktuellsten arduino version vorhanden und die board definition muss nachgeladen werden. 
+Nach installation stelle ich fest, das flaschen nicht möglich war auf grund von alten / nicht vorhandenen bootloader. 
+Flaschen war nur über programmiergerät möglich.  
+TinyUSB als erstes griffbereit. Nach stunden mit fehlern und unvollständig geflashten chips las in foreneintrag, das der verbaute atmega1814 nicht mit tinyusb klar kommt. -> AVRisp mit arduino leonardo  konnte flaschen. Nach vielen versuchen war der bootloader gebrannt und marlin war geflascht. Es tat sich nichts -> selbst einfachste sketche (led blinker) liefen nicht.
+Nach weiteren stunden und vergleichen mit der 5 jahre alten original firmware viel auf, dass das melzi board anstelle eines quarz oszilators (angenommen in den fuses der board definition des sanguinos) einen ceramiksozilator benutzt. Nach änderung der fuses 
+(stellen im board file einfügen) funktionierte jetzt marlin endlich und feinkonfiguration war möglich.
+Eine Krux beim Mono Mendel design ist, dass der X endstopp außerhalb der druckplatte liegt und X_Home_offset hinzugefügt werden muss. Dies ist aber so zu verstehen, das dauerhaft von allen koordinaten wert X abgezogen werden muss.
+
+-Bed Leveling Elektro Seite
+Mein Sensor in meinem drucker gibt 12V bei trigger und 0V bei keinem trigger aus. Spanungsteiler, fertig direkt an X endstopp ran.
+Unser sensor gibt nur ~2V bei trigger aus was zu wenig ist für atmel avr chips. Verstärkerschaltung mit npn transistor und 10kohm widerstand half. 5V wurden von der entfernten entprellung (1 kondensator, 1 widerstand) direkt vom board abgegriffen.
+
+
+
+
+Links zu onshape dokument des veränderten extruders,  link zum veränderten 3d drucker tutorials,  anleitung wenn induktiver sensor sich verschiebt!
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+

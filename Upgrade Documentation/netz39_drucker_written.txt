@@ -1,0 +1,73 @@
+Modernisierung Mono Mendel
+
+Nachdem der Drucker nun schon diversen Leuten viele Stunden Arbeit bereitet
+hat nur um dann nicht gut zu laufen, ist eine modernisierung bitter nötig gewesen. In diesem Blogartikel möchten wir die Probleme, Lösungen und unseren Weg dorthin schildern um einerseits zu dokumentieren und andererseits Überblick über moderne Features zu geben, die den 3D Druck so viel bequemer und sicherer machen.
+
+Geschichte
+==========
+
+Vorher kurz zur Geschichte des Druckers. Der Mono Mendel ist eines der ersten kommerziell erhältlichen Bastler 3D Drucker Sets, entworfen und verkauft im Rahmen des RepRap Projektes. Da Stratasys sehr lange das Patent für das FDM (Fused Deposition Modelling) Verfahren einbehalten hat, mussten alle Drucker quasi von Null anfangen. Dies Resultierte in unausgereiften Maschinen die viel Wartung sowie Vor- und Nachbereitung benötigten.
+
+Probleme
+========
+
+(1) Den mit Abstand größte Aufwand erzeugt das Leveling des Druckbettes. Das Drei-Punkt-System des Druckers benötigt ungefähr 20 Schritte für eine optimale Einstellung. Ein Erschwerender Faktor ist, dass das bloße bewegen des Druckers das Bett wieder aus der Waage wirft. Moderne Drucker Firmware (Marlin 1.1.6 z.Z. des Druckerupgrades)  bietet Möglichkeiten dies zu Automatisieren durch Abtastverfahren.
+
+(2) Nachdem das Bett gelevelt war und der Abstand Nozzle-Druckbett stimmte, muss das gedruckte nur noch haften bleiben während des Druckvorganges. Im Moment wird dies über Captonband auf einer Borosilikatglasplatte gelöst. Dies funktioniert mit mäßigem Erfolg. Leider muss das recht teure Captonband öfters ersetzt werden, da die Klebebahnen nach kurzem gebrauch abreißen. Abhilfe schafft hier ein extrem chemisch und temperaturresistes Polymer - PEI. Es hat die Eigenschaft bei ~60°C haftkräfte zu anderen Plastiken zu entwickeln und diese beim Abkühlen wieder zu verlieren.
+
+(3) Bei der Planerstellung des Upgrades ist aufgefallen, dass der Extruder einfach ohne Druckauftrag hochheizt, was ein großes Sicherheitsrisiko darstellt.
+
+(4) Ein weiteres Risiko ist die Stromversorung. Verzinne Kabelenden die lose in Wackligen Steckverbindern waren. Die Steckverbinder wurden nach einem kleinem Brandt schon ersertzt durch Schraubverbinder. Die Verzinnten Kabel allerdings nicht. Lötzinn hat die Eigenschaft sehr schnell zu oxidieren was den Widerstand der Verbindung erhöht und zu starker Wärmeentwicklung führt.
+
+(5) Als letztes ist die Kabelverlegung zu bemägeln. Knicken von Kabeln in zu stumpfen Winkeln führt zu schneller Kabelermüdung.
+
+
+Lösungen
+========
+
+Wir fangen bei den einfachsten Sachen an und Enden bei den aufwendigsten.
+
+(4) Die Kabel des Druckbettes und der Stromversorgung wurden abgeschnitten und neu mit Crimpkontakten versehen.
+
+(5) Während man die Kabel einmal in der Hand hatte, konnte man Filament benutzen um die Kabel zu den beweglichen Teilen (Drucktisch, Z-Achse) stabilisieren. Dies sollte verheddern und ermüdete Kabel vorbeugen. (Die X Achse braucht keine Stabilisierung da der PTFE Schlauch die Aufgabe des oben benutzten Filaments erfüllt.)
+
+(2) Die Glasplatte wird jetzt nun nicht mehr verwendet da der später benutzte induktiv Sensor nicht so weit das Metall darunter erkennen kann. Eine PEI (200µm dick) - M3 Doppelseitiges Kebeband kombination wurde direkt auf die Metalloberfläche des Druckbettes geklebt. (Gekauft auf shop.prusa3d.com, 3DPrima bietet dies neuerdings auch in Deutschland an)
+Um das Druckbett auzutauschen ist die Anleitung auf Prusa [1] zu befolgen.
+(Lemonen-D Klebelösungsmittel ist bei Michael Albrecht vorhanden)
+Um Z-Wobble zu verringern wurden die nun nicht mehr benötigten Federn des Druckbettes voll angezogen.
+
+(1) Der einfachste Weg für ein gekipptes Bett zu kompensieren ist es abzutasten und dann die Z-Achse während des Druckens zu verstellen. Wir haben uns dafür entschieden den induktiven Sensor LJ12A3-4-Z/AX (8mm NPN, Normally Closed) zu verwenden. In der Theorie sollte dieser Sensor bei 12V Betriebsspannung, 12V auf dem Signalausgang ausgeben und bei Metallnähe 0V. Wenn dem so währe hätte ein einfacher Spannungsteiler gereicht. 
+Leider haben wir ein Modell erhalten was Normally Open ist und nur ~2,2V bei Metallnähe und 0V sonst ausgibt. Um das Signal benutzbar zu machen benutzten wir einen NPN Transistor (BC337), 10k Ohm Widerstand  aus dem Hühnerfutter. 
+Anschließen an das Drucker Motherboard hat sich als einfach herausgestell. 
+12V wurden direkt vom Power In Anschluss genommen. 5V von der entfernten Schalterentprellung des Z-Endstopps. 
+Befestigt wurde der Sensor an einer modifizierten X-Carriage erhältlich auf der SD Speicherkarte des Druckers oder unter [2], [3].
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1] http://manual.prusa3d.com/Guide/Replacing+the+PEI+sheet/133
+[2] https://cad.onshape.com/documents/d9c64dcf8fac6b6ea6d052c8/w/349610eeabf111857678347d/e/9bfb796de247abf8072861fe
+[3] https://cad.onshape.com/documents/d9c64dcf8fac6b6ea6d052c8/w/349610eeabf111857678347d/e/b556a92d673e22fa0022ba71
+
+
+
+
+ 
+ 
+
